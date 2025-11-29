@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energent AI Agent - Computer Use</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chat-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #4b5563 #1f2937;
+        }
+        .vnc-placeholder {
+            background-image: radial-gradient(#374151 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white h-screen flex flex-col overflow-hidden">
+
+    <header class="bg-gray-800 border-b border-gray-700 p-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+            <h1 class="font-bold text-xl tracking-wide">Energent<span class="text-blue-400">AI</span> Agent</h1>
+        </div>
+        <div class="text-sm text-gray-400">Session: <span id="session-id" class="font-mono text-blue-300">...</span></div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+        
+        <div class="w-2/3 border-r border-gray-700 flex flex-col bg-black relative">
+            <div class="bg-gray-800 px-4 py-2 text-xs font-mono text-gray-400 border-b border-gray-700 flex justify-between">
+                <span>VIRTUAL DESKTOP (VNC)</span>
+                <span id="connection-status" class="text-yellow-500">Connecting...</span>
+            </div>
+            
+            <div class="flex-1 vnc-placeholder flex items-center justify-center relative group">
+                <iframe id="vnc-frame" src="" class="w-full h-full border-none hidden"></iframe>
+                
+                <div id="vnc-message" class="text-center p-6 bg-gray-800 rounded-lg shadow-xl border border-gray-700 max-w-md">
+                    <svg class="w-12 h-12 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <p class="text-gray-300 mb-2">Virtual Desktop View</p>
+                    <p class="text-xs text-gray-500">Agent will control the computer here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-1/3 flex flex-col bg-gray-900">
+            <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 chat-scroll">
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">AI</div>
+                    <div class="bg-gray-800 p-3 rounded-lg rounded-tl-none border border-gray-700 max-w-[90%]">
+                        <p class="text-sm text-gray-200">Hello! I'm your Computer Use Agent. How can I help you today?</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-gray-800 border-t border-gray-700">
+                <form id="chat-form" class="relative">
+                    <input type="text" id="user-input" 
+                        class="w-full bg-gray-900 text-white border border-gray-600 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:border-blue-500 transition-colors"
+                        placeholder="Type a command (e.g., 'Find a flight to Paris')..." autocomplete="off">
+                    <button type="submit" 
+                        class="absolute right-2 top-2 bg-blue-600 hover:bg-blue-700 text-white p-1.5 rounded-md transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Generate random Session ID
+        // Yeni (Modern Tarayıcılar için):
+        const sessionId = crypto.randomUUID();
+        document.getElementById('session-id').innerText = sessionId;
+
+        // WebSocket Connection
+        const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${sessionId}`);
+        const chatContainer = document.getElementById('chat-container');
+        const statusSpan = document.getElementById('connection-status');
+
+        ws.onopen = () => {
+            console.log("Connected to WebSocket");
+            statusSpan.innerText = "System Online";
+            statusSpan.className = "text-green-500 font-bold";
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log("Received:", data);
+
+            if (data.type === 'text') {
+                appendMessage('AI', data.content, 'assistant');
+            } else if (data.type === 'tool_use') {
+                appendSystemLog(`🛠️ Using Tool: ${data.name}`, data.input);
+            } else if (data.type === 'tool_result') {
+                // Tool sonuçlarını log olarak göster (çok uzunsa kısalt)
+                const output = data.content.length > 200 ? data.content.substring(0, 200) + "..." : data.content;
+                appendSystemLog(`✅ Tool Output`, output, true);
+            } else if (data.type === 'error') {
+                appendSystemLog(`❌ Error`, data.content, false, true);
+            }
+        };
+
+        ws.onclose = () => {
+            statusSpan.innerText = "Disconnected";
+            statusSpan.className = "text-red-500";
+        };
+
+        // Send Message
+        document.getElementById('chat-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Show user message immediately
+            appendMessage('You', message, 'user');
+            
+            // Send to backend
+            ws.send(message);
+            input.value = '';
+        });
+
+        function appendMessage(sender, text, role) {
+            const div = document.createElement('div');
+            div.className = `flex gap-3 ${role === 'user' ? 'flex-row-reverse' : ''}`;
+            
+            const avatar = role === 'user' 
+                ? `<div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">U</div>`
+                : `<div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">AI</div>`;
+            
+            const bubbleColor = role === 'user' ? 'bg-blue-900 border-blue-800' : 'bg-gray-800 border-gray-700';
+
+            div.innerHTML = `
+                ${avatar}
+                <div class="${bubbleColor} p-3 rounded-lg border max-w-[90%]">
+                    <p class="text-sm text-gray-200 whitespace-pre-wrap">${text}</p>
+                </div>
+            `;
+            chatContainer.appendChild(div);
+            scrollToBottom();
+        }
+
+        function appendSystemLog(title, detail, isSuccess = false, isError = false) {
+            const div = document.createElement('div');
+            div.className = "flex justify-center my-2";
+            
+            let colorClass = "text-gray-400 border-gray-700 bg-gray-800/50";
+            if (isError) colorClass = "text-red-400 border-red-900 bg-red-900/20";
+            
+            div.innerHTML = `
+                <div class="text-xs font-mono border rounded px-3 py-1 ${colorClass} max-w-[80%]">
+                    <span class="font-bold">${title}</span>
+                    ${detail ? `<span class="opacity-75 block mt-1 truncate">${typeof detail === 'object' ? JSON.stringify(detail) : detail}</span>` : ''}
+                </div>
+            `;
+            chatContainer.appendChild(div);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+
+    
+</body>
+</html>

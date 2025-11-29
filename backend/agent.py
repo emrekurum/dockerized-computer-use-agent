@@ -3,6 +3,10 @@ import platform
 from datetime import datetime
 from typing import Any, cast, Literal
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from anthropic import Anthropic, APIError, APIResponseValidationError, APIStatusError
 from anthropic.types.beta import (
@@ -32,7 +36,7 @@ SYSTEM_PROMPT = f"""<SYSTEM_CAPABILITY>
 * When using your bash tool with commands that are expected to output very large quantities of text, redirect into a tmp file and use str_replace_based_edit_tool or `grep -n -B <lines before> -A <lines after> <query> <filename>` to confirm output.
 * When viewing a page it can be helpful to zoom out so that you can see everything on the page.  Either that, or make sure you scroll down to see everything before deciding something isn't available.
 * When using your computer function calls, they take a while to run and send back to you.  Where possible/feasible, try to chain multiple of these calls all into one function calls request.
-* The current date is {datetime.today().strftime("%A, %B %-d, %Y")}.
+* The current date is {datetime.today().strftime("%A, %B %d, %Y")}.
 </SYSTEM_CAPABILITY>
 
 <IMPORTANT>
@@ -113,7 +117,7 @@ async def run_agent(session_id: str, input_text: str, chat_history: list):
     # Using a default tool version, explicitly typed as ToolVersion literal
     tool_version: ToolVersion = "computer_use_20241022"
     tool_group = TOOL_GROUPS_BY_VERSION[tool_version]
-    tool_collection = ToolCollection(*(ToolCls() for ToolCls in tool_group.tools))
+    tool_collection = ToolCollection(*tool_group.tools)
     
     # 3. Prepare Messages
     messages: list[BetaMessageParam] = []
@@ -156,7 +160,7 @@ async def run_agent(session_id: str, input_text: str, chat_history: list):
             raw_response = client.beta.messages.with_raw_response.create(
                 max_tokens=max_tokens,
                 messages=messages,
-                model="claude-3-5-sonnet-20241022", # Default model
+                model="claude-sonnet-4-5",
                 system=[system],
                 tools=tool_collection.to_params(),
                 betas=betas,
