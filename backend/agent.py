@@ -60,7 +60,18 @@ def _response_to_params(response: BetaMessage) -> list[BetaContentBlockParam]:
                     thinking_block["signature"] = getattr(block, "signature", None)
                 res.append(cast(BetaContentBlockParam, thinking_block))
         else:
-            res.append(cast(BetaToolUseBlockParam, block.model_dump()))
+            # --- DÜZELTME BURADA ---
+            # Model dump yerine manuel olarak sadece izin verilen alanları alıyoruz
+            # Bu işlem 'caller' gibi API'nin reddettiği gizli alanları otomatik eler.
+            block_dict = block.model_dump()
+            cleaned_block = {
+                "type": block_dict["type"],
+                "id": block_dict["id"],
+                "name": block_dict["name"],
+                "input": block_dict["input"]
+            }
+            res.append(cast(BetaToolUseBlockParam, cleaned_block))
+            # -----------------------
     return res
 
 def _make_api_tool_result(result: ToolResult, tool_use_id: str) -> BetaToolResultBlockParam:
@@ -124,21 +135,18 @@ async def run_agent(session_id: str, input_text: str, chat_history: list):
     
     # Reconstruct history
     for msg in chat_history:
-        # msg is expected to be the SQLAlchemy model or Pydantic schema
         role = msg.role
         content_str = msg.content
         
-        # Try to parse content as JSON, if it fails, treat as plain text
         try:
             content = json.loads(content_str)
         except (json.JSONDecodeError, TypeError):
             content = content_str
             
-        # Map "tool" role from DB to "user" role with tool_result content for Anthropic
         if role == "tool":
-             messages.append({"role": "user", "content": content})
+            messages.append({"role": "user", "content": content})
         else:
-             messages.append({"role": role, "content": content})
+            messages.append({"role": role, "content": content})
 
     # Append the new user message
     messages.append({"role": "user", "content": input_text})

@@ -34,15 +34,13 @@
                 <span id="connection-status" class="text-yellow-500">Connecting...</span>
             </div>
             
-            <div class="flex-1 vnc-placeholder flex items-center justify-center relative group">
-                <iframe id="vnc-frame" src="" class="w-full h-full border-none hidden"></iframe>
+            <div class="flex-1 vnc-placeholder flex items-center justify-center relative group bg-black">
+                <iframe id="vnc-frame" 
+                    src="http://127.0.0.1:6080/vnc.html?autoconnect=true&resize=scale" 
+                    class="w-full h-full border-none">
+                </iframe>
                 
-                <div id="vnc-message" class="text-center p-6 bg-gray-800 rounded-lg shadow-xl border border-gray-700 max-w-md">
-                    <svg class="w-12 h-12 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    <p class="text-gray-300 mb-2">Virtual Desktop View</p>
-                    <p class="text-xs text-gray-500">Agent will control the computer here.</p>
                 </div>
-            </div>
         </div>
 
         <div class="w-1/3 flex flex-col bg-gray-900">
