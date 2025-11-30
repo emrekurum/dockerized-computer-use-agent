@@ -115,7 +115,7 @@ async def run_agent(session_id: str, input_text: str, chat_history: list):
     
     # 2. Setup Tools
     # Using a default tool version, explicitly typed as ToolVersion literal
-    tool_version: ToolVersion = "computer_use_20241022"
+    tool_version: ToolVersion = "computer_use_20250124"
     tool_group = TOOL_GROUPS_BY_VERSION[tool_version]
     tool_collection = ToolCollection(*tool_group.tools)
     
@@ -160,7 +160,7 @@ async def run_agent(session_id: str, input_text: str, chat_history: list):
             raw_response = client.beta.messages.with_raw_response.create(
                 max_tokens=max_tokens,
                 messages=messages,
-                model="claude-3-5-sonnet-20241022",
+                model="claude-sonnet-4-20250514",
                 system=[system],
                 tools=tool_collection.to_params(),
                 betas=betas,

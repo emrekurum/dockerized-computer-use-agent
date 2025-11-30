@@ -258,7 +258,7 @@ class EditTool20250124(BaseAnthropicTool):
             + "\n"
         )
 
-# ÖNEMLİ: groups.py tarafından çağrılan sınıf budur.
+# Geriye uyumluluk için 2024 sınıfını 2025 sınıfından miras alıyoruz
 class EditTool20241022(EditTool20250124):
     api_type: Literal["text_editor_20241022"] = "text_editor_20241022" # pyright: ignore[reportIncompatibleVariableOverride]
     name: Literal["str_replace_editor"] = "str_replace_editor" # pyright: ignore[reportIncompatibleVariableOverride]
