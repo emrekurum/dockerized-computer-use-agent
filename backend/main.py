@@ -1,10 +1,12 @@
 import traceback
 from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Sequence, Union
 from uuid import UUID
 from contextlib import asynccontextmanager
+import os
 
 from . import crud, schemas, models
 from .database import engine, Base, SessionLocal
@@ -127,3 +129,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         except:
             # If connection is already closed, ignore
             pass
+
+# Frontend statik dosyalarını sun
+# "frontend" klasörünün proje ana dizininde olduğunu varsayıyoruz
+frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
+
+if os.path.exists(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")

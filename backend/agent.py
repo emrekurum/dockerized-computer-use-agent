@@ -160,7 +160,7 @@ async def run_agent(session_id: str, input_text: str, chat_history: list):
             raw_response = client.beta.messages.with_raw_response.create(
                 max_tokens=max_tokens,
                 messages=messages,
-                model="claude-sonnet-4-5",
+                model="claude-3-5-sonnet-20241022",
                 system=[system],
                 tools=tool_collection.to_params(),
                 betas=betas,

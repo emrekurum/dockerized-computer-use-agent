@@ -24,3 +24,4 @@ class ChatMessage(Base):
 
     session = relationship("Session", back_populates="messages")
 
+
