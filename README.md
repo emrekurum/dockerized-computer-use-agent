@@ -1,126 +1,147 @@
-🤖 Energent.ai Backend Challenge: Scalable Computer Use Agent
-This repository contains a robust, scalable, and containerized backend solution for the Anthropic Computer Use Agent, developed as part of the Energent.ai technical challenge.
+# 🤖 Energent.ai Backend Challenge: Scalable Computer Use Agent
 
-The original experimental Streamlit interface has been completely replaced with a FastAPI backend, utilizing WebSockets for real-time streaming, SQLite (Async) for persistence, and Docker for a fully isolated Linux execution environment with VNC support.
+![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.95+-009688?style=for-the-badge&logo=fastapi)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker)
+![Anthropic](https://img.shields.io/badge/AI-Claude%203.5%20Sonnet-important?style=for-the-badge&logo=anthropic)
 
-🚀 Key Features
-⚡ High-Performance Backend: Built with FastAPI and Uvicorn, utilizing asynchronous Python for high concurrency.
+A production-ready, containerized backend solution for the **Anthropic Computer Use Agent**, developed as a submission for the Energent.ai technical challenge.
 
-🔄 Real-Time Streaming: Full-duplex WebSocket communication for instant chat interactions and live agent feedback.
+This project refactors the original experimental Streamlit interface into a scalable **FastAPI** architecture, featuring **WebSocket** streaming, **Asynchronous SQLite** persistence, and a fully isolated **Linux Desktop** environment within Docker.
 
-🧠 Advanced Agent Integration: Integrated Claude 3.5 Sonnet (20241022) with "Computer Use" capabilities, handling tool execution loops and error recovery.
+---
 
-🖥️ Live VNC Integration: Embedded noVNC client allowing users to view the agent's virtual desktop and interactions in real-time within the browser.
+## 📺 Demo
 
-💾 Persistent Memory: Chat history and session management persisted using SQLAlchemy (Async) and SQLite.
+**[Watch the 5-minute Demo Video Here](YOUTUBE_VEYA_DRIVE_LINKINI_BURAYA_YAPISTIR)**
 
-🐳 Fully Containerized: A single Dockerfile orchestrates the Backend, Virtual Display (Xvfb), Window Manager (Fluxbox), and VNC Server.
+*(The video demonstrates real-time chat, tool execution logic, and the agent interacting with the Linux environment via screenshots and commands.)*
 
-🛡️ Robust Error Handling: Includes defensive coding against invalid session IDs, API timeouts, and platform-specific incompatibilities.
+---
 
-🛠️ Tech Stack
-Language: Python 3.11
+## 🏗️ Architecture
 
-Framework: FastAPI
+The system is designed using **Clean Architecture** principles to ensure separation of concerns and scalability.
 
-AI Model: Anthropic Claude 3.5 Sonnet
+```mermaid
+graph TD
+    User[User / Browser] <-->|WebSocket & HTTP| FastAPI[FastAPI Backend]
+    User <-->|noVNC (Port 6080)| VNC[Virtual Desktop]
+    
+    subgraph Docker Container
+        FastAPI <-->|Async CRUD| SQLite[(SQLite Database)]
+        FastAPI <-->|Events| Agent[AI Agent Logic]
+        
+        Agent <-->|API Calls| Anthropic[Anthropic API]
+        Agent <-->|Shell/Mouse Commands| Linux[Linux OS / Xvfb]
+        
+        Linux -->|Display :1| VNC
+    end
+```
 
-Database: SQLite + SQLAlchemy (Async/Await)
+## 🚀 Key Features
 
-Protocol: WebSocket
+*   **⚡ High-Performance Backend:** Replaced synchronous Streamlit with FastAPI and Uvicorn, enabling high concurrency and asynchronous processing.
+*   **🔄 Real-Time Streaming:** Implemented full-duplex WebSockets to stream agent thoughts, tool outputs, and errors instantly to the client.
+*   **🧠 "Computer Use" Integration:** Integrated Claude 3.5 Sonnet (20241022) to control a virtual Linux machine (mouse, keyboard, bash, screenshot).
+*   **🖥️ Live Desktop View:** Embedded noVNC client allowing users to watch the agent's actions on the virtual desktop in real-time within the browser.
+*   **💾 Persistent Memory:** Chat history and session management persisted using SQLAlchemy (Async) and SQLite.
+*   **🛡️ Robust Error Handling:** Includes defensive coding against invalid session IDs, tool parameter mismatches, and API timeouts.
+*   **🐳 One-Click Deployment:** A single Dockerfile orchestrates the Backend, Virtual Display (Xvfb), Window Manager (Fluxbox), and VNC Server.
 
-Virtualization: Docker, Xvfb, x11vnc, noVNC, Fluxbox
+## 🛠️ Tech Stack
 
-Frontend: HTML5, TailwindCSS, JavaScript (Vanilla)
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Backend Framework** | FastAPI | High-performance, easy-to-learn, fast to code, ready for production. |
+| **Language** | Python 3.11 | Leveraging modern `asyncio` features. |
+| **Database** | SQLite + SQLAlchemy | Async/Await ORM for persistence. |
+| **Real-time** | WebSockets | Low-latency bi-directional communication. |
+| **AI Model** | Claude 3.5 Sonnet | The latest model supporting "Computer Use" beta. |
+| **Virtualization** | Docker, Xvfb | Headless display server for the agent. |
+| **Desktop Env** | Fluxbox, x11vnc | Lightweight window manager and VNC server. |
+| **Frontend** | HTML5, TailwindCSS | Clean, responsive UI for chat and VNC viewing. |
 
-📂 Project Structure
-The project follows Clean Architecture principles to ensure maintainability and scalability.
+## 📂 Project Structure
 
-Plaintext
-
+```plaintext
 energent-backend-challenge/
 ├── backend/
-│   ├── main.py          # Application entry point, WebSocket & CORS configuration
-│   ├── agent.py         # Anthropic Agent Logic & Tool Execution Loop
-│   ├── crud.py          # Database operations (Create, Read)
-│   ├── models.py        # SQLAlchemy Database Models (Session, ChatMessage)
-│   ├── schemas.py       # Pydantic Schemas for Data Validation
-│   └── database.py      # Async Database Connection Setup
-├── computer_use_demo/   # Anthropic's original tool definitions (Refactored)
-├── frontend/            # Single Page Application (Chat + VNC)
-│   └── index.html
-├── Dockerfile           # Multi-stage build for Linux environment & App
-├── requirements.txt     # Python dependencies
-└── .env                 # Environment variables (API Keys, Config)
-⚡ Getting Started (Docker)
-The easiest way to run the application is using Docker. It handles all system dependencies (xdotool, xvfb, etc.) automatically.
+│   ├── main.py          # Entry point, WebSocket handlers, CORS
+│   ├── agent.py         # Anthropic Agent Loop & Tool Logic
+│   ├── crud.py          # Async Database Operations
+│   ├── models.py        # SQLAlchemy Tables (Sessions, Messages)
+│   ├── schemas.py       # Pydantic Models for Validation
+│   └── database.py      # Async Engine Configuration
+├── computer_use_demo/   # Refactored Anthropic Tool Definitions
+├── frontend/            # Single Page Application
+│   └── index.html       # Chat UI + VNC Iframe
+├── Dockerfile           # Multi-stage build (Linux tools + Python env)
+├── requirements.txt     # Project dependencies
+└── .env                 # Configuration (API Keys)
+```
 
-Prerequisites
-Docker Desktop installed and running.
+## ⚡ Getting Started
 
-An Anthropic API Key with access to claude-3-5-sonnet-20241022.
+The application is designed to run inside Docker to ensure all Linux dependencies (`xdotool`, `scrot`, etc.) are present, regardless of the host OS (Windows/Mac/Linux).
 
-1. Clone the Repository
-Bash
+### Prerequisites
 
+*   Docker Desktop installed and running.
+*   An Anthropic API Key (Tier 1+ recommended for Computer Use access).
+
+### 1. Clone & Configure
+
+```bash
 git clone https://github.com/emrekurum/energent-backend-challenge.git
 cd energent-backend-challenge
-2. Configure Environment
-Create a .env file in the root directory:
 
-Bash
+# Create .env file
+echo "ANTHROPIC_API_KEY=sk-ant-api03-YOUR-KEY-HERE" > .env
+echo "WIDTH=1024" >> .env
+echo "HEIGHT=768" >> .env
+```
 
-ANTHROPIC_API_KEY=sk-ant-api03-YOUR-KEY-HERE
-WIDTH=1024
-HEIGHT=768
-DISPLAY_NUM=1
-3. Build & Run
-Build the Docker image (this may take a few minutes as it installs the Linux desktop environment):
+### 2. Build the Container
 
-Bash
-
+```bash
 docker build -t energent-agent .
-Run the container (Mapping ports 8000 for API and 6080 for VNC):
+```
 
-Bash
+### 3. Run the Application
 
+This command maps port 8000 (API/Chat) and 6080 (VNC View).
+
+```bash
 docker run -p 8000:8000 -p 6080:6080 --env-file .env energent-agent
-4. Access the Application
-Open your browser and navigate to: 👉 http://127.0.0.1:8000
+```
 
-Chat: Interact with the agent on the right panel.
+### 4. Usage
 
-View: Watch the live Linux desktop on the left panel.
+Open your browser and navigate to: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-🧪 Usage Examples
-Once the system is online, try these commands:
+*   **Chat:** Type "Hello" to test the connection.
+*   **Test Computer Use:** Type "Take a screenshot" or "Open Firefox". You will see the agent interacting with the virtual desktop on the left panel.
 
-Basic Chat: "Hello, who are you?"
+## 🧠 Design Decisions & Trade-offs
 
-Computer Control: "Take a screenshot of the desktop." (You will see the screenshot appear in the chat).
+### Why FastAPI over Streamlit?
+Streamlit is excellent for prototyping but runs on a synchronous execution model that re-runs the entire script on every interaction. FastAPI provides a persistent state, handles concurrent connections efficiently via `asyncio`, and allows for fine-grained control over the WebSocket lifecycle, which is crucial for a chat agent that streams tokens.
 
-Application Launch: "Open Firefox and check the https://www.google.com/search?q=google.com" (Watch the VNC screen on the left!).
+### Why Docker with Fluxbox?
+The "Computer Use" tools require an X11 display server (`$DISPLAY`). Running this directly on Windows or MacOS is problematic due to OS differences.
+*   **Xvfb:** Creates a virtual framebuffer (headless screen).
+*   **Fluxbox:** A lightweight window manager added to render windows properly (so screenshots aren't just black boxes).
+*   **noVNC:** Bridges the Docker display to the browser, satisfying the requirement to "view the virtual machine."
 
-🏗️ Design Decisions
-Why FastAPI & WebSockets?
-Unlike Streamlit (which is synchronous and reruns scripts), FastAPI provides a persistent, asynchronous server environment. WebSockets were chosen over HTTP polling to minimize latency for real-time tool outputs (like screenshots or cursor movements).
+### Handling Tool Caller Errors
+During development, I encountered `400 Bad Request` errors due to the Python SDK adding a `caller` parameter that the Beta API rejected. I implemented a custom sanitizer in `agent.py` to strip unauthorized parameters from the tool response before sending it back to the API, ensuring stability.
 
-Why SQLite?
-For this challenge, SQLite (via aiosqlite) was chosen for its zero-configuration setup and portability. However, the use of SQLAlchemy ORM allows for an instant switch to PostgreSQL in a production environment by simply changing the connection string.
+## 🤝 Collaborators
 
-Why Docker with Fluxbox?
-The "Computer Use" agent requires a display server ($DISPLAY). Windows/Mac cannot natively provide the X11 interface required by tools like xdotool.
+*   **Lead Developer:** Emre Kurum
+*   **Reviewers:** lingjiekong, ghamry03, goldmermaid, EnergentAI (Invited to repo)
 
-Xvfb: Creates a virtual frame buffer (headless display).
+## 📜 License
 
-Fluxbox: A lightweight window manager to render windows (like Firefox) so the screenshots aren't just black boxes.
-
-x11vnc + noVNC: Bridges the Docker display to the web browser via WebSocket.
-
-🤝 Collaborators
-Emre Kurum (Lead Developer)
-
-Invited: lingjiekong, ghamry03, goldmermaid, EnergentAI
-
-⚖️ License
-Based on Anthropic Computer Use Demo. Modified for Energent.ai Challenge.
+This project is based on the Anthropic Computer Use Demo and modified for the Energent.ai coding challenge.
