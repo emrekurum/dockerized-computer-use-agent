@@ -57,7 +57,7 @@ graph TD
 | **Language** | Python 3.11 | Leveraging modern `asyncio` features. |
 | **Database** | SQLite + SQLAlchemy | Async/Await ORM for persistence. |
 | **Real-time** | WebSockets | Low-latency bi-directional communication. |
-| **AI Model** | Claude 3.5 Sonnet | The latest model supporting "Computer Use" beta. |
+| **AI Model** | claude-sonnet-4-20250514 | The latest model supporting "Computer Use" beta. |
 | **Virtualization** | Docker, Xvfb | Headless display server for the agent. |
 | **Desktop Env** | Fluxbox, x11vnc | Lightweight window manager and VNC server. |
 | **Frontend** | HTML5, TailwindCSS | Clean, responsive UI for chat and VNC viewing. |
