@@ -13,7 +13,7 @@ This project refactors the original experimental Streamlit interface into a scal
 
 ## 📺 Demo
 
-**[Watch the 5-minute Demo Video Here](YOUTUBE_VEYA_DRIVE_LINKINI_BURAYA_YAPISTIR)**
+**[Watch the 5-minute Demo Video Here](https://www.youtube.com/watch?v=P5A--Im6Z7c)**
 
 *(The video demonstrates real-time chat, tool execution logic, and the agent interacting with the Linux environment via screenshots and commands.)*
 
@@ -26,7 +26,7 @@ The system is designed using **Clean Architecture** principles to ensure separat
 ```mermaid
 graph TD
     User[User / Browser] <-->|WebSocket & HTTP| FastAPI[FastAPI Backend]
-    User <-->|noVNC (Port 6080)| VNC[Virtual Desktop]
+    User <-->|noVNC Port 6080| VNC[Virtual Desktop]
     
     subgraph Docker Container
         FastAPI <-->|Async CRUD| SQLite[(SQLite Database)]
