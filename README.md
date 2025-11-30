@@ -1,183 +1,126 @@
-# Anthropic Computer Use Demo
+🤖 Energent.ai Backend Challenge: Scalable Computer Use Agent
+This repository contains a robust, scalable, and containerized backend solution for the Anthropic Computer Use Agent, developed as part of the Energent.ai technical challenge.
 
-> [!NOTE]
-> Now featuring support for the new Claude 4 models! The latest Claude Sonnet 4.5 (claude-sonnet-4-5-20250929) is now the default model, with Claude Sonnet 4 (claude-sonnet-4-20250514), Claude Opus 4 (claude-opus-4-20250514), and the new Claude Haiku 4.5 (claude-haiku-4-5-20251001) also available. These models bring next-generation capabilities with the updated str_replace_based_edit_tool that replaces the previous str_replace_editor tool. The undo_edit command has been removed in this latest version for a more streamlined experience.
+The original experimental Streamlit interface has been completely replaced with a FastAPI backend, utilizing WebSockets for real-time streaming, SQLite (Async) for persistence, and Docker for a fully isolated Linux execution environment with VNC support.
 
-> [!CAUTION]
-> Computer use is a beta feature. Please be aware that computer use poses unique risks that are distinct from standard API features or chat interfaces. These risks are heightened when using computer use to interact with the internet. To minimize risks, consider taking precautions such as:
->
-> 1. Use a dedicated virtual machine or container with minimal privileges to prevent direct system attacks or accidents.
-> 2. Avoid giving the model access to sensitive data, such as account login information, to prevent information theft.
-> 3. Limit internet access to an allowlist of domains to reduce exposure to malicious content.
-> 4. Ask a human to confirm decisions that may result in meaningful real-world consequences as well as any tasks requiring affirmative consent, such as accepting cookies, executing financial transactions, or agreeing to terms of service.
->
-> In some circumstances, Claude will follow commands found in content even if it conflicts with the user's instructions. For example, instructions on webpages or contained in images may override user instructions or cause Claude to make mistakes. We suggest taking precautions to isolate Claude from sensitive data and actions to avoid risks related to prompt injection.
->
-> Finally, please inform end users of relevant risks and obtain their consent prior to enabling computer use in your own products.
+🚀 Key Features
+⚡ High-Performance Backend: Built with FastAPI and Uvicorn, utilizing asynchronous Python for high concurrency.
 
-This repository helps you get started with computer use on Claude, with reference implementations of:
+🔄 Real-Time Streaming: Full-duplex WebSocket communication for instant chat interactions and live agent feedback.
 
-- Build files to create a Docker container with all necessary dependencies
-- A computer use agent loop using the Claude API, Bedrock, or Vertex to access Claude 3.5 Sonnet, Claude 3.7 Sonnet, Claude Sonnet 4, Claude Opus 4, and Claude Haiku 4.5 models
-- Anthropic-defined computer use tools
-- A streamlit app for interacting with the agent loop
+🧠 Advanced Agent Integration: Integrated Claude 3.5 Sonnet (20241022) with "Computer Use" capabilities, handling tool execution loops and error recovery.
 
-Please use [this form](https://forms.gle/BT1hpBrqDPDUrCqo7) to provide feedback on the quality of the model responses, the API itself, or the quality of the documentation - we cannot wait to hear from you!
+🖥️ Live VNC Integration: Embedded noVNC client allowing users to view the agent's virtual desktop and interactions in real-time within the browser.
 
-> [!IMPORTANT]
-> The Beta API used in this reference implementation is subject to change. Please refer to the [API release notes](https://docs.claude.com/en/release-notes/api) for the most up-to-date information.
+💾 Persistent Memory: Chat history and session management persisted using SQLAlchemy (Async) and SQLite.
 
-> [!IMPORTANT]
-> The components are weakly separated: the agent loop runs in the container being controlled by Claude, can only be used by one session at a time, and must be restarted or reset between sessions if necessary.
+🐳 Fully Containerized: A single Dockerfile orchestrates the Backend, Virtual Display (Xvfb), Window Manager (Fluxbox), and VNC Server.
 
-## Quickstart: running the Docker container
+🛡️ Robust Error Handling: Includes defensive coding against invalid session IDs, API timeouts, and platform-specific incompatibilities.
 
-### Claude API
+🛠️ Tech Stack
+Language: Python 3.11
 
-> [!TIP]
-> You can find your API key in the [Claude Console](https://console.anthropic.com/).
+Framework: FastAPI
 
-```bash
-export ANTHROPIC_API_KEY=%your_api_key%
-docker run \
-    -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-    -v $HOME/.anthropic:/home/computeruse/.anthropic \
-    -p 5900:5900 \
-    -p 8501:8501 \
-    -p 6080:6080 \
-    -p 8080:8080 \
-    -it ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
-```
+AI Model: Anthropic Claude 3.5 Sonnet
 
-Once the container is running, see the [Accessing the demo app](#accessing-the-demo-app) section below for instructions on how to connect to the interface.
+Database: SQLite + SQLAlchemy (Async/Await)
 
-### Bedrock
+Protocol: WebSocket
 
-> [!TIP]
-> To use the new Claude 3.7 Sonnet on Bedrock, you first need to [request model access](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-modify.html).
+Virtualization: Docker, Xvfb, x11vnc, noVNC, Fluxbox
 
-You'll need to pass in AWS credentials with appropriate permissions to use Claude on Bedrock.
-You have a few options for authenticating with Bedrock. See the [boto3 documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html#environment-variables) for more details and options.
+Frontend: HTML5, TailwindCSS, JavaScript (Vanilla)
 
-#### Option 1: (suggested) Use the host's AWS credentials file and AWS profile
+📂 Project Structure
+The project follows Clean Architecture principles to ensure maintainability and scalability.
 
-```bash
-export AWS_PROFILE=<your_aws_profile>
-docker run \
-    -e API_PROVIDER=bedrock \
-    -e AWS_PROFILE=$AWS_PROFILE \
-    -e AWS_REGION=us-west-2 \
-    -v $HOME/.aws:/home/computeruse/.aws \
-    -v $HOME/.anthropic:/home/computeruse/.anthropic \
-    -p 5900:5900 \
-    -p 8501:8501 \
-    -p 6080:6080 \
-    -p 8080:8080 \
-    -it ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
-```
+Plaintext
 
-Once the container is running, see the [Accessing the demo app](#accessing-the-demo-app) section below for instructions on how to connect to the interface.
+energent-backend-challenge/
+├── backend/
+│   ├── main.py          # Application entry point, WebSocket & CORS configuration
+│   ├── agent.py         # Anthropic Agent Logic & Tool Execution Loop
+│   ├── crud.py          # Database operations (Create, Read)
+│   ├── models.py        # SQLAlchemy Database Models (Session, ChatMessage)
+│   ├── schemas.py       # Pydantic Schemas for Data Validation
+│   └── database.py      # Async Database Connection Setup
+├── computer_use_demo/   # Anthropic's original tool definitions (Refactored)
+├── frontend/            # Single Page Application (Chat + VNC)
+│   └── index.html
+├── Dockerfile           # Multi-stage build for Linux environment & App
+├── requirements.txt     # Python dependencies
+└── .env                 # Environment variables (API Keys, Config)
+⚡ Getting Started (Docker)
+The easiest way to run the application is using Docker. It handles all system dependencies (xdotool, xvfb, etc.) automatically.
 
-#### Option 2: Use an access key and secret
+Prerequisites
+Docker Desktop installed and running.
 
-```bash
-export AWS_ACCESS_KEY_ID=%your_aws_access_key%
-export AWS_SECRET_ACCESS_KEY=%your_aws_secret_access_key%
-export AWS_SESSION_TOKEN=%your_aws_session_token%
-docker run \
-    -e API_PROVIDER=bedrock \
-    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-    -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-    -e AWS_REGION=us-west-2 \
-    -v $HOME/.anthropic:/home/computeruse/.anthropic \
-    -p 5900:5900 \
-    -p 8501:8501 \
-    -p 6080:6080 \
-    -p 8080:8080 \
-    -it ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
-```
+An Anthropic API Key with access to claude-3-5-sonnet-20241022.
 
-Once the container is running, see the [Accessing the demo app](#accessing-the-demo-app) section below for instructions on how to connect to the interface.
+1. Clone the Repository
+Bash
 
-### Vertex
+git clone https://github.com/emrekurum/energent-backend-challenge.git
+cd energent-backend-challenge
+2. Configure Environment
+Create a .env file in the root directory:
 
-You'll need to pass in Google Cloud credentials with appropriate permissions to use Claude on Vertex.
+Bash
 
-```bash
-docker build . -t computer-use-demo
-gcloud auth application-default login
-export VERTEX_REGION=%your_vertex_region%
-export VERTEX_PROJECT_ID=%your_vertex_project_id%
-docker run \
-    -e API_PROVIDER=vertex \
-    -e CLOUD_ML_REGION=$VERTEX_REGION \
-    -e ANTHROPIC_VERTEX_PROJECT_ID=$VERTEX_PROJECT_ID \
-    -v $HOME/.config/gcloud/application_default_credentials.json:/home/computeruse/.config/gcloud/application_default_credentials.json \
-    -p 5900:5900 \
-    -p 8501:8501 \
-    -p 6080:6080 \
-    -p 8080:8080 \
-    -it computer-use-demo
-```
+ANTHROPIC_API_KEY=sk-ant-api03-YOUR-KEY-HERE
+WIDTH=1024
+HEIGHT=768
+DISPLAY_NUM=1
+3. Build & Run
+Build the Docker image (this may take a few minutes as it installs the Linux desktop environment):
 
-Once the container is running, see the [Accessing the demo app](#accessing-the-demo-app) section below for instructions on how to connect to the interface.
+Bash
 
-This example shows how to use the Google Cloud Application Default Credentials to authenticate with Vertex.
-You can also set `GOOGLE_APPLICATION_CREDENTIALS` to use an arbitrary credential file, see the [Google Cloud Authentication documentation](https://cloud.google.com/docs/authentication/application-default-credentials#GAC) for more details.
+docker build -t energent-agent .
+Run the container (Mapping ports 8000 for API and 6080 for VNC):
 
-### Accessing the demo app
+Bash
 
-Once the container is running, open your browser to [http://localhost:8080](http://localhost:8080) to access the combined interface that includes both the agent chat and desktop view.
+docker run -p 8000:8000 -p 6080:6080 --env-file .env energent-agent
+4. Access the Application
+Open your browser and navigate to: 👉 http://127.0.0.1:8000
 
-The container stores settings like the API key and custom system prompt in `~/.anthropic/`. Mount this directory to persist these settings between container runs.
+Chat: Interact with the agent on the right panel.
 
-Alternative access points:
+View: Watch the live Linux desktop on the left panel.
 
-- Streamlit interface only: [http://localhost:8501](http://localhost:8501)
-- Desktop view only: [http://localhost:6080/vnc.html](http://localhost:6080/vnc.html)
-- Direct VNC connection: `vnc://localhost:5900` (for VNC clients)
+🧪 Usage Examples
+Once the system is online, try these commands:
 
-## Screen size
+Basic Chat: "Hello, who are you?"
 
-Environment variables `WIDTH` and `HEIGHT` can be used to set the screen size. For example:
+Computer Control: "Take a screenshot of the desktop." (You will see the screenshot appear in the chat).
 
-```bash
-docker run \
-    -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-    -v $HOME/.anthropic:/home/computeruse/.anthropic \
-    -p 5900:5900 \
-    -p 8501:8501 \
-    -p 6080:6080 \
-    -p 8080:8080 \
-    -e WIDTH=1920 \
-    -e HEIGHT=1080 \
-    -it ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
-```
+Application Launch: "Open Firefox and check the https://www.google.com/search?q=google.com" (Watch the VNC screen on the left!).
 
-We do not recommend sending screenshots in resolutions above [XGA/WXGA](https://en.wikipedia.org/wiki/Display_resolution_standards#XGA) to avoid issues related to [image resizing](https://docs.claude.com/en/docs/build-with-claude/vision#evaluate-image-size).
-Relying on the image resizing behavior in the API will result in lower model accuracy and slower performance than implementing scaling in your tools directly. The `computer` tool implementation in this project demonstrates how to scale both images and coordinates from higher resolutions to the suggested resolutions.
+🏗️ Design Decisions
+Why FastAPI & WebSockets?
+Unlike Streamlit (which is synchronous and reruns scripts), FastAPI provides a persistent, asynchronous server environment. WebSockets were chosen over HTTP polling to minimize latency for real-time tool outputs (like screenshots or cursor movements).
 
-When implementing computer use yourself, we recommend using XGA resolution (1024x768):
+Why SQLite?
+For this challenge, SQLite (via aiosqlite) was chosen for its zero-configuration setup and portability. However, the use of SQLAlchemy ORM allows for an instant switch to PostgreSQL in a production environment by simply changing the connection string.
 
-- For higher resolutions: Scale the image down to XGA and let the model interact with this scaled version, then map the coordinates back to the original resolution proportionally.
-- For lower resolutions or smaller devices (e.g. mobile devices): Add black padding around the display area until it reaches 1024x768.
+Why Docker with Fluxbox?
+The "Computer Use" agent requires a display server ($DISPLAY). Windows/Mac cannot natively provide the X11 interface required by tools like xdotool.
 
-## Development
+Xvfb: Creates a virtual frame buffer (headless display).
 
-```bash
-./setup.sh  # configure venv, install development dependencies, and install pre-commit hooks
-docker build . -t computer-use-demo:local  # manually build the docker image (optional)
-export ANTHROPIC_API_KEY=%your_api_key%
-docker run \
-    -e ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
-    -v $(pwd)/computer_use_demo:/home/computeruse/computer_use_demo/ `# mount local python module for development` \
-    -v $HOME/.anthropic:/home/computeruse/.anthropic \
-    -p 5900:5900 \
-    -p 8501:8501 \
-    -p 6080:6080 \
-    -p 8080:8080 \
-    -it computer-use-demo:local  # can also use ghcr.io/anthropics/anthropic-quickstarts:computer-use-demo-latest
-```
+Fluxbox: A lightweight window manager to render windows (like Firefox) so the screenshots aren't just black boxes.
 
-The docker run command above mounts the repo inside the docker image, such that you can edit files from the host. Streamlit is already configured with auto reloading.
+x11vnc + noVNC: Bridges the Docker display to the web browser via WebSocket.
+
+🤝 Collaborators
+Emre Kurum (Lead Developer)
+
+Invited: lingjiekong, ghamry03, goldmermaid, EnergentAI
+
+⚖️ License
+Based on Anthropic Computer Use Demo. Modified for Energent.ai Challenge.
