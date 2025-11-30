@@ -43,7 +43,7 @@ graph TD
 
 *   **⚡ High-Performance Backend:** Replaced synchronous Streamlit with FastAPI and Uvicorn, enabling high concurrency and asynchronous processing.
 *   **🔄 Real-Time Streaming:** Implemented full-duplex WebSockets to stream agent thoughts, tool outputs, and errors instantly to the client.
-*   **🧠 "Computer Use" Integration:** Integrated Claude 3.5 Sonnet (20241022) to control a virtual Linux machine (mouse, keyboard, bash, screenshot).
+*   **🧠 "Computer Use" Integration:** Integrated "claude-sonnet-4-20250514" to control a virtual Linux machine (mouse, keyboard, bash, screenshot).
 *   **🖥️ Live Desktop View:** Embedded noVNC client allowing users to watch the agent's actions on the virtual desktop in real-time within the browser.
 *   **💾 Persistent Memory:** Chat history and session management persisted using SQLAlchemy (Async) and SQLite.
 *   **🛡️ Robust Error Handling:** Includes defensive coding against invalid session IDs, tool parameter mismatches, and API timeouts.
