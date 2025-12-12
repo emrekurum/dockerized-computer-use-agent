@@ -65,7 +65,7 @@ graph TD
 ## 📂 Project Structure
 
 ```plaintext
-energent-backend-challenge/
+dockerized-computer-use-agent/
 ├── backend/
 │   ├── main.py          # Entry point, WebSocket handlers, CORS
 │   ├── agent.py         # Anthropic Agent Loop & Tool Logic
@@ -93,8 +93,8 @@ The application is designed to run inside Docker to ensure all Linux dependencie
 ### 1. Clone & Configure
 
 ```bash
-git clone https://github.com/emrekurum/energent-backend-challenge.git
-cd energent-backend-challenge
+git clone https://github.com/emrekurum/dockerized-computer-use-agent.git
+cd dockerized-computer-use-agent
 
 # Create .env file
 echo "ANTHROPIC_API_KEY=sk-ant-api03-YOUR-KEY-HERE" > .env
