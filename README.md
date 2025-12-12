@@ -1,4 +1,4 @@
-# 🤖 Energent.ai Backend Challenge: Scalable Computer Use Agent
+# 🤖 Scalable Computer Use Agent
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.95+-009688?style=for-the-badge&logo=fastapi)
@@ -140,8 +140,7 @@ During development, I encountered `400 Bad Request` errors due to the Python SDK
 ## 🤝 Collaborators
 
 *   **Lead Developer:** Emre Kurum
-*   **Reviewers:** lingjiekong, ghamry03, goldmermaid, EnergentAI (Invited to repo)
 
 ## 📜 License
 
-This project is based on the Anthropic Computer Use Demo and modified for the Energent.ai coding challenge.
+This project is based on the Anthropic Computer Use Demo.
