@@ -5,7 +5,7 @@
 ![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker)
 ![Anthropic](https://img.shields.io/badge/AI-Claude%203.5%20Sonnet-important?style=for-the-badge&logo=anthropic)
 
-A production-ready, containerized backend solution for the **Anthropic Computer Use Agent**, developed as a submission for the Energent.ai technical challenge.
+A production-ready, containerized backend solution for the **Anthropic Computer Use Agent**.
 
 This project refactors the original experimental Streamlit interface into a scalable **FastAPI** architecture, featuring **WebSocket** streaming, **Asynchronous SQLite** persistence, and a fully isolated **Linux Desktop** environment within Docker.
 
